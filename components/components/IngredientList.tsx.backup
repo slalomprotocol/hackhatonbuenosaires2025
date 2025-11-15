@@ -1,0 +1,321 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+
+interface IngredientRating {
+  ticker: string;
+  score: number;
+  quality: string;
+  sentiment: string;
+  lsRatio: number;
+  riskLevel: string;
+  color: 'green' | 'yellow' | 'red';
+  recommendation: string;
+  chefNotes: string[];
+  marketData: {
+    volume24h: string;
+    totalNotional: string;
+    traders: { long: number; short: number };
+    majSidePL: string;
+  } | null;
+}
+
+interface IngredientListProps {
+  selectedIngredients?: string[];
+  onSelectIngredient?: (ticker: string) => void;
+}
+
+export default function IngredientList({ 
+  selectedIngredients = [], 
+  onSelectIngredient 
+}: IngredientListProps) {
+  const [ingredients, setIngredients] = useState<IngredientRating[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedIngredient, setSelectedIngredient] = useState<IngredientRating | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    fetchIngredients();
+  }, []);
+
+  const fetchIngredients = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/lawrence/rate-ingredient');
+      const data = await response.json();
+      
+      if (data.success) {
+        setIngredients(data.ratings);
+      }
+    } catch (error) {
+      console.error('Failed to fetch ingredients:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredIngredients = ingredients.filter(ing => 
+    ing.ticker.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const getColorClass = (color: string) => {
+    switch (color) {
+      case 'green': return 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400';
+      case 'yellow': return 'bg-yellow-500/20 border-yellow-500/50 text-yellow-400';
+      case 'red': return 'bg-red-500/20 border-red-500/50 text-red-400';
+      default: return 'bg-neutral-500/20 border-neutral-500/50 text-neutral-400';
+    }
+  };
+
+  const getMichelinStars = (score: number) => {
+    if (score >= 85) return '⭐⭐⭐';
+    if (score >= 70) return '⭐⭐';
+    if (score >= 55) return '⭐';
+    return '—';
+  };
+
+  const getMichelinLabel = (score: number) => {
+    if (score >= 85) return 'Exceptional';
+    if (score >= 70) return 'Excellent';
+    if (score >= 55) return 'High Quality';
+    return 'Use Caution';
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-12">
+        <div className="text-center space-y-4">
+          <div className="text-6xl animate-bounce">🐼</div>
+          <p className="text-neutral-400">Lawrence is checking the pantry...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-bold text-white">🐼 Lawrence's Ingredient Pantry</h2>
+          <p className="text-neutral-400 mt-1">
+            Select your ingredients • {ingredients.length} available coins
+          </p>
+        </div>
+        
+        {/* Search */}
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search ingredients..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="bg-neutral-900 border border-neutral-700 rounded-lg px-4 py-2 pl-10 text-white focus:outline-none focus:border-emerald-500/50"
+          />
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500">🔍</span>
+        </div>
+      </div>
+
+      {/* Ingredient Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {filteredIngredients.map((ingredient, index) => {
+          const isSelected = selectedIngredients.includes(ingredient.ticker);
+          return (
+            <motion.div
+              key={ingredient.ticker}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+              className={`
+                relative p-4 rounded-xl border-2 cursor-pointer
+                bg-neutral-900/50 backdrop-blur-sm
+                transition-all duration-300 hover:scale-105
+                ${getColorClass(ingredient.color)}
+                ${isSelected ? 'ring-2 ring-emerald-500 ring-offset-2 ring-offset-neutral-950' : ''}
+              `}
+            >
+              {/* Selection Indicator */}
+              {isSelected && (
+                <div className="absolute top-2 left-2 bg-emerald-500 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                  ✓ Added
+                </div>
+              )}
+
+              {/* Score Badge */}
+              <div className="absolute top-2 right-2 bg-black/50 px-2 py-1 rounded-full text-xs font-bold">
+                {ingredient.score}/100
+              </div>
+
+              {/* Ticker */}
+              <div className="text-2xl font-bold text-white mb-2">
+                {ingredient.ticker}
+              </div>
+
+              {/* Michelin Stars */}
+              <div className="mb-3">
+                <div className="text-lg mb-1">{getMichelinStars(ingredient.score)}</div>
+                <div className="text-xs text-neutral-400">{getMichelinLabel(ingredient.score)}</div>
+              </div>
+
+              {/* Sentiment */}
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xs text-neutral-400">Sentiment:</span>
+                <span className="text-xs font-semibold">{ingredient.sentiment}</span>
+              </div>
+
+              {/* L/S Ratio Bar */}
+              <div className="mb-2">
+                <div className="flex justify-between text-xs text-neutral-400 mb-1">
+                  <span>L/S Ratio</span>
+                  <span>{ingredient.lsRatio}%</span>
+                </div>
+                <div className="h-2 bg-neutral-800 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all"
+                    style={{ width: `${ingredient.lsRatio}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Risk Badge */}
+              <div className="inline-block px-2 py-1 rounded-full bg-black/30 text-xs">
+                Risk: {ingredient.riskLevel}
+              </div>
+
+              {/* Trader Count */}
+              {ingredient.marketData && (
+                <div className="mt-2 text-xs text-neutral-400">
+                  👥 {ingredient.marketData.traders.long + ingredient.marketData.traders.short} traders
+                </div>
+              )}
+
+              {/* Quick Action Buttons */}
+              <div className="mt-3 flex gap-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onSelectIngredient) {
+                      onSelectIngredient(ingredient.ticker);
+                    }
+                  }}
+                  className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all ${
+                    isSelected 
+                      ? 'bg-red-500/20 border border-red-500/50 text-red-400 hover:bg-red-500/30'
+                      : 'bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/30'
+                  }`}
+                >
+                  {isSelected ? 'Remove' : 'Add to Dish'}
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedIngredient(ingredient);
+                  }}
+                  className="py-2 px-3 rounded-lg text-xs font-bold bg-neutral-800/50 border border-neutral-700 text-neutral-300 hover:bg-neutral-800 transition-all"
+                >
+                  Details
+                </button>
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {/* Selected Ingredient Modal */}
+      {selectedIngredient && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          onClick={() => setSelectedIngredient(null)}
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        >
+          <motion.div
+            initial={{ scale: 0.9, y: 20 }}
+            animate={{ scale: 1, y: 0 }}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-neutral-900 border-2 border-emerald-500/50 rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+          >
+            {/* Header */}
+            <div className="flex items-start justify-between mb-6">
+              <div>
+                <h3 className="text-4xl font-bold text-white mb-2">
+                  {selectedIngredient.ticker}
+                </h3>
+                <div className="flex items-center gap-3">
+                  <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getColorClass(selectedIngredient.color)}`}>
+                    {selectedIngredient.score}/100
+                  </span>
+                  <span className="text-3xl">{getMichelinStars(selectedIngredient.score)}</span>
+                  <span className="text-sm text-neutral-400">{getMichelinLabel(selectedIngredient.score)}</span>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedIngredient(null)}
+                className="text-neutral-400 hover:text-white text-2xl"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Recommendation */}
+            <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4 mb-6">
+              <p className="text-emerald-400 font-semibold">{selectedIngredient.recommendation}</p>
+            </div>
+
+            {/* Lawrence's Chef Notes */}
+            <div className="space-y-3 mb-6">
+              <h4 className="text-lg font-bold text-white flex items-center gap-2">
+                🐼 Lawrence's Chef Notes
+              </h4>
+              {selectedIngredient.chefNotes.map((note, i) => (
+                <div key={i} className="bg-neutral-800/50 rounded-lg p-3 text-neutral-300 text-sm">
+                  {note}
+                </div>
+              ))}
+            </div>
+
+            {/* Market Data */}
+            {selectedIngredient.marketData && (
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="bg-neutral-800/50 rounded-lg p-3">
+                  <div className="text-xs text-neutral-400 mb-1">24h Volume</div>
+                  <div className="text-lg font-bold text-white">{selectedIngredient.marketData.volume24h}</div>
+                </div>
+                <div className="bg-neutral-800/50 rounded-lg p-3">
+                  <div className="text-xs text-neutral-400 mb-1">Total Notional</div>
+                  <div className="text-lg font-bold text-white">{selectedIngredient.marketData.totalNotional}</div>
+                </div>
+                <div className="bg-neutral-800/50 rounded-lg p-3">
+                  <div className="text-xs text-neutral-400 mb-1">Traders</div>
+                  <div className="text-lg font-bold text-white">
+                    🟢 {selectedIngredient.marketData.traders.long} / 🔴 {selectedIngredient.marketData.traders.short}
+                  </div>
+                </div>
+                <div className="bg-neutral-800/50 rounded-lg p-3">
+                  <div className="text-xs text-neutral-400 mb-1">Majority P/L</div>
+                  <div className="text-lg font-bold text-white">
+                    {selectedIngredient.marketData.majSidePL === 'Profit' ? '📈 Profit' : '📉 Loss'}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Add to Recipe Button */}
+            <button 
+              onClick={() => {
+                if (onSelectIngredient) {
+                  onSelectIngredient(selectedIngredient.ticker);
+                }
+                setSelectedIngredient(null);
+              }}
+              className="w-full py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold rounded-lg transition-all"
+            >
+              {selectedIngredients.includes(selectedIngredient.ticker) ? 'Remove from Recipe' : 'Add to Recipe'} 🍳
+            </button>
+          </motion.div>
+        </motion.div>
+      )}
+    </div>
+  );
+}
