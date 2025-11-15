@@ -1,0 +1,75 @@
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Next.js
+/.next/
+/out/
+.next
+out
+
+# Production
+/build
+dist
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Deployment artifacts
+cloudflare deployment/
+
+# Backups
+*.bak
+*.backup
+
+# Personal notes
+claudia.txt
+CLAUDE-PROMPT.txt
+
+# Test images
+*.jpeg
+*.jpg
+*.png
+!public/**/*.jpeg
+!public/**/*.jpg
+!public/**/*.png
+
+# HTML test files
+investor.html
+versionhackhaton.html
