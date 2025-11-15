@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --apillon-purple: #8B5CF6;
+  --apillon-blue: #3B82F6;
+  --apillon-green: #10B981;
+}
+
+body {
+  @apply bg-gray-50 text-gray-900;
+}
+
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-blue-500;
+}
+
+.card {
+  @apply bg-white rounded-xl shadow-lg p-6 border border-gray-100;
+}
+
+.btn-primary {
+  @apply bg-gradient-to-r from-purple-500 to-blue-500 text-white px-6 py-3 rounded-lg font-medium hover:shadow-xl transition-all duration-300;
+}
+
+.btn-secondary {
+  @apply bg-white text-gray-700 px-6 py-3 rounded-lg font-medium border border-gray-200 hover:shadow-lg transition-all duration-300;
+}
