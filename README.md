@@ -221,7 +221,7 @@ This project is licensed under the MIT License - see [LICENSE](./LICENSE) file.
 
 ## 🏆 SUB0 Hackathon 2025
 
-Built for SUB0 Hackathon in Buenos Aires, Argentina.
+Built for SUB0 Hackathon and Hyperliquid Hackathon in Buenos Aires, Argentina.
 
 **Tracks:**
 - Polkadot Main Track (SHIP-A-TON)
