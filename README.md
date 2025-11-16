@@ -1,6 +1,6 @@
 # 🚀 SLALOM Protocol
 
-**Cross-chain DeFi bridge connecting Polkadot with HyperLiquid**
+**Cross-chain DeFi bridge connecting other blockchains with HyperLiquid**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
@@ -10,10 +10,10 @@
 
 ## 🎯 Overview
 
-SLALOM Protocol is a cross-chain DeFi bridge that connects Polkadot's security with HyperLiquid's high-performance derivatives trading. Built with a Disney-themed educational interface to make DeFi accessible.
+SLALOM Protocol is a cross-chain DeFi bridge that connects HyperLiquid's high-performance erpetual trading user vaults with other blockhains. Built with a Disney-themed educational interface to make DeFi accessible to everyone, specially the casual traders. The goal is to make Defi as accesible like a videogame. 
 
 **Key Features:**
-- 🌉 Polkadot ↔ HyperLiquid Bridge
+- 🌉 Algoand (example) ↔ HyperLiquid Bridge
 - 🐼 Disney-themed Educational UX
 - 🎮 Auto Demo Mode (no wallet needed)
 - 💰 Bonding Curve Vaults
@@ -219,14 +219,12 @@ This project is licensed under the MIT License - see [LICENSE](./LICENSE) file.
 
 ---
 
-## 🏆 SUB0 Hackathon 2025
+## 🏆 Hyerliquid Sheraton Hotel Hackathon 2025
 
-Built for SUB0 Hackathon and Hyperliquid Hackathon in Buenos Aires, Argentina.
+Built for Hyperliquid Hackathon in Buenos Aires, Argentina.
 
 **Tracks:**
-- Polkadot Main Track (SHIP-A-TON)
-- Hyperbridge Bounty
-- Marketing Bounty
+- HyperLiquid Buenos Aires Sheraton Hotel Hackhaton
 
 ---
 
