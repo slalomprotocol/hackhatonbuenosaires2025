@@ -3,15 +3,24 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+<<<<<<< HEAD
 import dynamicComponent from 'next/dynamic';
 import { initPolkadotApi, storeRatingOnChain, queryRecentRatings } from '@/lib/polkadot';
 import { getStoredVaults } from '@/lib/hyperliquid';
+=======
+import dynamicImport from 'next/dynamic';
+import { initPolkadotApi, storeRatingOnChain, queryRecentRatings } from '@/lib/polkadot';
+>>>>>>> 1c41f414333dbca0ff837ec3e11e45c21e664383
 
 // Disable static generation for this page (uses window/localStorage)
 export const dynamic = 'force-dynamic';
 
 // Dynamic import to prevent SSR issues with Polkadot extension
+<<<<<<< HEAD
 const PolkadotWalletConnect = dynamicComponent(
+=======
+const PolkadotWalletConnect = dynamicImport(
+>>>>>>> 1c41f414333dbca0ff837ec3e11e45c21e664383
   () => import('@/components/PolkadotWalletConnect'),
   { ssr: false }
 );
@@ -30,7 +39,10 @@ export default function CommunityPage() {
   const [recentRatings, setRecentRatings] = useState<UserRating[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [connectedAccount, setConnectedAccount] = useState<any>(null);
+<<<<<<< HEAD
   const [deployedVaults, setDeployedVaults] = useState<any[]>([]);
+=======
+>>>>>>> 1c41f414333dbca0ff837ec3e11e45c21e664383
 
   useEffect(() => {
     initializePolkadot();

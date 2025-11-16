@@ -1,0 +1,177 @@
+'use client';
+
+import { motion } from 'framer-motion';
+import { useState } from 'react';
+
+interface AllocationInputProps {
+  value: number;
+  onChange: (value: number) => void;
+  remaining: number;
+  max?: number;
+  disabled?: boolean;
+  totalPositions: number;
+}
+
+export default function AllocationInput({
+  value,
+  onChange,
+  remaining,
+  max = 100,
+  disabled = false,
+  totalPositions,
+}: AllocationInputProps) {
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    setLocalValue(inputValue);
+
+    // Allow empty string for editing
+    if (inputValue === '') {
+      onChange(0);
+      setError(null);
+      return;
+    }
+
+    const numValue = parseFloat(inputValue);
+
+    // Validate
+    if (isNaN(numValue)) {
+      setError('Must be a number');
+      return;
+    }
+
+    if (numValue < 0) {
+      setError('Cannot be negative');
+      return;
+    }
+
+    if (numValue > max) {
+      setError(`Cannot exceed ${max}%`);
+      return;
+    }
+
+    // Check if it exceeds remaining allocation
+    const availableForThis = remaining + value;
+    if (numValue > availableForThis) {
+      setError(`Only ${availableForThis.toFixed(1)}% available`);
+      return;
+    }
+
+    setError(null);
+    onChange(numValue);
+  };
+
+  const handleBlur = () => {
+    // If empty on blur, set to 0
+    if (localValue === '' || isNaN(parseFloat(localValue))) {
+      setLocalValue('0');
+      onChange(0);
+    } else {
+      // Round to 1 decimal place
+      const rounded = Math.round(parseFloat(localValue) * 10) / 10;
+      setLocalValue(rounded.toString());
+      onChange(rounded);
+    }
+  };
+
+  const percentage = Math.min((value / max) * 100, 100);
+  const isValid = !error && value > 0;
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <label className="text-sm text-neutral-400">Allocation</label>
+        <span className="text-xs text-neutral-500">
+          Remaining: {remaining.toFixed(1)}%
+        </span>
+      </div>
+
+      {/* Input Field */}
+      <div className="relative">
+        <input
+          type="text"
+          inputMode="decimal"
+          value={localValue}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          disabled={disabled}
+          placeholder="0.0"
+          className={`
+            w-full bg-neutral-900 border-2 rounded-lg px-4 py-3 pr-12
+            text-white font-bold text-lg text-center
+            focus:outline-none transition-colors
+            ${
+              error
+                ? 'border-red-500/50 focus:border-red-500'
+                : isValid
+                ? 'border-emerald-500/50 focus:border-emerald-500'
+                : 'border-neutral-700 focus:border-primary/50'
+            }
+            ${disabled ? 'cursor-not-allowed opacity-50' : ''}
+          `}
+        />
+        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 text-lg font-bold">
+          %
+        </span>
+      </div>
+
+      {/* Progress Bar */}
+      <div className="h-2 bg-neutral-800 rounded-full overflow-hidden">
+        <motion.div
+          className={`h-full ${
+            error
+              ? 'bg-gradient-to-r from-red-500 to-red-600'
+              : isValid
+              ? 'bg-gradient-to-r from-emerald-500 to-emerald-600'
+              : 'bg-gradient-to-r from-neutral-600 to-neutral-700'
+          }`}
+          initial={false}
+          animate={{ width: `${percentage}%` }}
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        />
+      </div>
+
+      {/* Error Message */}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-xs text-red-400 flex items-center gap-1"
+        >
+          <span>⚠️</span>
+          <span>{error}</span>
+        </motion.div>
+      )}
+
+      {/* Quick Preset Buttons */}
+      <div className="flex gap-2">
+        {[10, 25, 33, 50].map((preset) => {
+          const availableForThis = remaining + value;
+          const isAvailable = preset <= availableForThis;
+          return (
+            <button
+              key={preset}
+              type="button"
+              onClick={() => isAvailable && onChange(preset)}
+              disabled={disabled || !isAvailable}
+              className={`
+                flex-1 py-1.5 px-2 rounded text-xs font-semibold
+                transition-all active:scale-95
+                ${
+                  value === preset
+                    ? 'bg-emerald-500 text-white'
+                    : isAvailable
+                    ? 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700 hover:text-neutral-300'
+                    : 'bg-neutral-900 text-neutral-600 cursor-not-allowed'
+                }
+              `}
+            >
+              {preset}%
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

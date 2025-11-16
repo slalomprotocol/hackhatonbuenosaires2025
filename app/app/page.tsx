@@ -2,7 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+<<<<<<< HEAD
 import dynamicComponent from 'next/dynamic';
+=======
+import dynamicImport from 'next/dynamic';
+>>>>>>> 1c41f414333dbca0ff837ec3e11e45c21e664383
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { getTranslations, getCurrentLanguage } from '@/lib/translations';
 
@@ -10,7 +14,11 @@ import { getTranslations, getCurrentLanguage } from '@/lib/translations';
 export const dynamic = 'force-dynamic';
 
 // Dynamic import to prevent SSR issues with Polkadot extension
+<<<<<<< HEAD
 const PolkadotWalletConnect = dynamicComponent(
+=======
+const PolkadotWalletConnect = dynamicImport(
+>>>>>>> 1c41f414333dbca0ff837ec3e11e45c21e664383
   () => import('@/components/PolkadotWalletConnect'),
   { ssr: false }
 );
