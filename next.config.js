@@ -2,9 +2,10 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  // Disable static optimization - use dynamic rendering
-  // This fixes "window is not defined" errors with Polkadot extensions
-  output: 'standalone',
+  // Cloudflare Pages configuration
+  // Use 'export' for static export, or remove for dynamic rendering
+  // For Cloudflare Pages with Next.js, we'll use @cloudflare/next-on-pages
+  output: process.env.CF_PAGES ? undefined : 'standalone',
   typescript: {
     ignoreBuildErrors: true,
   },

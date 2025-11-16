@@ -1,0 +1,13 @@
+# Cloudflare Pages configuration for SLALOM Protocol
+# This file is used for local development with Wrangler
+
+name = "slalom-protocol"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = ".vercel/output/static"
+
+[env.production]
+name = "slalom-protocol"
+
+[env.preview]
+name = "slalom-protocol-preview"
+
